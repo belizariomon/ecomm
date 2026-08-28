@@ -15,6 +15,10 @@ type Value = {
 const AuthContext = createContext<Value | null>(null)
 const demoUser: User = { id: 'demo-user', name: 'Alex Morgan', email: 'alex@example.com' }
 
+function applicationBaseUrl() {
+  return new URL(import.meta.env.BASE_URL, window.location.origin).toString()
+}
+
 function mapUser(user: Auth0User): User {
   return {
     id: user.sub ?? user.email ?? 'auth0-user',
@@ -54,10 +58,13 @@ function Auth0Bridge({ children }: { children: ReactNode }) {
     logout: auth0Logout,
   } = useAuth0()
   const login = async (connection: SocialConnection) => {
-    await loginWithRedirect({ authorizationParams: { connection } })
+    await loginWithRedirect({
+      appState: { returnTo: '/profile' },
+      authorizationParams: { connection },
+    })
   }
   const logout = async () => {
-    auth0Logout({ logoutParams: { returnTo: window.location.origin } })
+    auth0Logout({ logoutParams: { returnTo: applicationBaseUrl() } })
   }
 
   return (
@@ -101,7 +108,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     <Auth0Provider
       domain={auth0Config.domain}
       clientId={auth0Config.clientId}
-      authorizationParams={{ redirect_uri: `${window.location.origin}/profile` }}
+      // The callback must be a real static URL. GitHub Pages cannot serve /profile directly,
+      // so Auth0 returns to the app root and HashRouter then navigates to #/profile.
+      authorizationParams={{ redirect_uri: applicationBaseUrl() }}
+      onRedirectCallback={(appState) => {
+        window.location.hash = appState?.returnTo ?? '/profile'
+      }}
     >
       <Auth0Bridge>{children}</Auth0Bridge>
     </Auth0Provider>

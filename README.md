@@ -20,4 +20,4 @@ npm test
 
 ## OAuth
 
-The default `VITE_AUTH_MODE=auth0` uses Auth0 Universal Login. Create an Auth0 **Single Page Application**, configure Google, Facebook and Microsoft connections, and set `VITE_AUTH0_DOMAIN` and `VITE_AUTH0_CLIENT_ID`. In the Auth0 application, allow `http://localhost:5173/profile` as a callback URL plus the localhost origin for logout and web origins. These values are public browser configuration; connection secrets stay only in Auth0. `VITE_AUTH_MODE=mock` remains an explicit local demo mode, not OAuth.
+The default `VITE_AUTH_MODE=auth0` uses Auth0 Universal Login. Create an Auth0 **Single Page Application**, configure Google, Facebook and Microsoft connections, and set `VITE_AUTH0_DOMAIN` and `VITE_AUTH0_CLIENT_ID`. In Auth0, allow the application root (`http://localhost:5173/`) as callback and logout URL, plus `http://localhost:5173` as a web origin. Routes use `#` so the same build works on static hosts such as GitHub Pages. These values are public browser configuration; connection secrets stay only in Auth0. `VITE_AUTH_MODE=mock` remains an explicit local demo mode, not OAuth.
